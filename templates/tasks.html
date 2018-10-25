@@ -8,9 +8,16 @@
 </head>
 <body>
     
-    <p>
-        <h1>Hi</h1>
-    </p>
+    <h1>Tasks</h1>
+    
+    {% for task in tasks %}
+    <p><h2>{{ task.task_name }}</h2></p>
+    <p>{{ task.task_description }}</p>
+    <p>{{ task.is_urgent }}</p>
+    <p>{{ task.due_date }}</p>
+    <hr>
+    {% endfor %}
+
     
 </body>
 </html>
