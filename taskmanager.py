@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect
 import os
 from flask_pymongo import PyMongo
+from bson.objectid import ObjectId
 
 app = Flask(__name__)
 
@@ -25,7 +26,7 @@ def get_tasks_by_collection(collection_name):
 def add_task():
     if request.method=="POST":
         form_values = request.form.to_dict()
-        form_values["is_urgent"] = "is urgent" in form_values
+        form_values["is_urgent"] = "is_urgent" in form_values
         category = form_values["category_name"]
         mongo.db[category].insert_one(form_values)
         return redirect("/")
@@ -36,6 +37,18 @@ def add_task():
                 categories.append(category)
         
         return render_template("add_task.html", categories=categories)
+        
+@app.route('/tasks/<category>/<task_id>/edit')
+def edit_task(category, task_id):
+    the_task =  mongo.db[category].find_one({"_id": ObjectId(task_id)})
+    categories = []
+    for category in mongo.db.collection_names():
+        if not category.startswith("system."):
+            categories.append(category)
+
+    return render_template('edit_task.html', task=the_task, categories=categories)        
+        
+
 
 if __name__ == "__main__":
         app.run(host=os.getenv('IP', '0.0.0.0'), port=int(os.getenv('PORT', 8080)), debug=True)
